@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Threadly</title>
+<meta name="description" content="Threadly: communities, posts, votes and comments. Works on phone, tablet and laptop.">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ff6a2b">
+<link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--bg:#0e1113;--card:#161a1d;--line:#2a3035;--text:#e8ecef;--mut:#8a949c;--acc:#ff6a2b;--up:#ff6a2b;--down:#6a8cff;--hov:#1e2327;--input:#0e1113}
+:root[data-theme=light]{--bg:#e9edf0;--card:#fff;--line:#d5dbe0;--text:#1a1d20;--mut:#667078;--hov:#f2f5f7;--input:#f6f8fa}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none}a:hover{text-decoration:underline}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+input,textarea,select{font:inherit;color:var(--text);background:var(--input);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+textarea{resize:vertical;min-height:90px}
+.muted{color:var(--mut)}.center{text-align:center}
+#top{position:sticky;top:0;z-index:30;height:54px;display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line)}
+#burger{display:none;font-size:22px;padding:4px 8px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;letter-spacing:-.3px}
+.logo img{width:30px;height:30px;border-radius:8px}
+#sf{flex:1;max-width:560px}
+#sf input{border-radius:999px;padding:8px 16px;background:var(--hov)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:999px;background:var(--acc);color:#fff;font-weight:700;border:0;white-space:nowrap}
+.btn:hover{filter:brightness(1.08);text-decoration:none}
+.btn.ghost{background:transparent;border:1px solid var(--acc);color:var(--acc)}
+.btn.wide{width:100%;margin-top:10px}
+.btn.sm{padding:4px 12px;font-size:13px}
+.btn.danger{background:#d93a3a}
+#who{display:flex;align-items:center;gap:8px;margin-left:auto}
+#who .nm{display:flex;align-items:center;gap:6px;font-weight:600}
+.av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:700;flex:none}
+#wrap{max-width:1180px;margin:0 auto;padding:16px;display:grid;grid-template-columns:230px minmax(0,1fr) 290px;gap:16px;align-items:start}
+#nav,#side{position:sticky;top:70px;max-height:calc(100vh - 86px);overflow:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2,.card h3{margin:0 0 8px}
+#nav a,#nav button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;text-align:left}
+#nav a:hover,#nav button:hover{background:var(--hov);text-decoration:none}
+#nav a.on{background:var(--hov);font-weight:700}
+#nav h4{margin:14px 10px 4px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut)}
+.cdot{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex:none}
+.sorts{display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:14px}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.post{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.post:hover{border-color:#3b434a}
+.votes{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0;width:48px;background:rgba(127,127,127,.07);flex:none}
+.votes button,.cvote button{font-size:17px;line-height:1;color:var(--mut);padding:4px 8px;border-radius:6px}
+.votes button:hover,.cvote button:hover{background:var(--hov)}
+.votes[data-my="1"] .up,.cvote[data-my="1"] .up{color:var(--up)}
+.votes[data-my="-1"] .down,.cvote[data-my="-1"] .down{color:var(--down)}
+.votes[data-my="1"] .sc,.cvote[data-my="1"] .sc{color:var(--up)}
+.votes[data-my="-1"] .sc,.cvote[data-my="-1"] .sc{color:var(--down)}
+.sc{font-weight:800;font-size:14px}
+.pbody{padding:10px 14px 8px 12px;min-width:0;flex:1}
+.meta{font-size:12.5px;color:var(--mut);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.meta a.c{color:var(--text);font-weight:700}
+.post h3{margin:5px 0;font-size:18px;line-height:1.3;word-wrap:break-word;overflow-wrap:anywhere}
+.snip{color:var(--mut);margin:4px 0 6px;overflow-wrap:anywhere}
+.pimg img{display:block;max-width:100%;max-height:520px;border-radius:10px;margin:8px 0;background:#000}
+.plink{display:inline-block;margin:4px 0;color:var(--down);font-size:14px;word-break:break-all}
+.acts{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.acts a,.acts button{padding:5px 9px;border-radius:6px;color:var(--mut);font-weight:600;font-size:13px}
+.acts a:hover,.acts button:hover{background:var(--hov);text-decoration:none}
+.acts .on{color:var(--acc)}
+.body{overflow-wrap:anywhere}.body p{margin:6px 0}.body ul{margin:6px 0;padding-left:22px}
+.body blockquote{margin:6px 0;padding:2px 12px;border-left:3px solid var(--line);color:var(--mut)}
+.body code{background:var(--hov);padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:13.5px}
+.body a{color:var(--down);text-decoration:underline}
+.cm{display:flex;gap:6px;margin-top:10px}
+.cvote{display:flex;flex-direction:column;align-items:center;width:30px;flex:none}
+.cvote button{font-size:13px;padding:1px 6px}.cvote .sc{font-size:12px}
+.cmain{flex:1;min-width:0}
+.cmeta{font-size:12.5px;color:var(--mut);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cmeta a.u{color:var(--text);font-weight:700}
+.cact{display:flex;gap:2px;margin-top:2px}
+.cact button{padding:3px 8px;font-size:12.5px;color:var(--mut);font-weight:600;border-radius:6px}
+.cact button:hover{background:var(--hov)}
+.kids{margin-left:2px;padding-left:12px;border-left:2px solid var(--line)}
+.kids.flat{margin-left:0;padding-left:0;border-left:0}
+.cm.folded>.cmain>.cbody,.cm.folded>.cmain>.cact,.cm.folded>.cmain>.kids,.cm.folded>.cmain>.reply{display:none}
+.cm.folded>.cvote{visibility:hidden}
+.banner{height:80px;border-radius:12px 12px 0 0;margin:-14px -14px 10px}
+.chead{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.chead .cdot{width:64px;height:64px;font-size:26px;border:4px solid var(--card);margin-top:-30px}
+.chead .grow{flex:1;min-width:150px}
+.prof{display:flex;gap:14px;align-items:center}
+label{font-weight:600;display:block;margin:10px 0 4px}
+.row{margin:10px 0}
+.tabs{display:flex;gap:4px;margin:10px 0}
+.err{color:#ff6b6b;font-size:14px;min-height:20px;margin-top:6px}
+.hint{font-size:13px;color:var(--mut)}
+#modal{display:none}#modal.on{display:block}
+.ov{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:100%;max-width:400px;max-height:90vh;overflow:auto}
+.box h3{margin:0 0 6px}
+.btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:#222a30;color:#fff;border:1px solid #3b454d;padding:10px 18px;border-radius:999px;z-index:200;transition:transform .25s;max-width:90vw;font-weight:600;pointer-events:none}
+#toast.on{transform:translateX(-50%) translateY(0)}
+.side-c{display:flex;align-items:center;gap:10px;padding:6px 0}
+.side-c .grow{flex:1;min-width:0}
+.steps{padding-left:20px;font-size:14px}.steps li{margin:4px 0}
+details summary{cursor:pointer;font-weight:700;margin:8px 0}
+img.pv{max-width:100%;max-height:260px;border-radius:10px;margin-top:8px}
+@media(max-width:1000px){#wrap{grid-template-columns:210px minmax(0,1fr)}#side{display:none}}
+@media(max-width:760px){
+ #wrap{display:block;padding:10px}#burger{display:block}
+ #nav{position:fixed;z-index:50;left:0;top:54px;bottom:0;width:260px;max-height:none;background:var(--card);border-right:1px solid var(--line);padding:10px;transform:translateX(-105%);transition:transform .2s}
+ #nav.open{transform:none}
+ .logo span{display:none}#sf{min-width:0}
+ #who .nm span{display:none}.btn{padding:8px 12px}
+ .post h3{font-size:16.5px}
+ .votes{width:40px}
+}
+</style></head><body>
+<header id="top">
+  <button id="burger" aria-label="Menu">☰</button>
+  <a href="#/" class="logo"><img src="icon-192.png" alt=""><span>Threadly</span></a>
+  <form id="sf"><input id="q" type="search" placeholder="Search Threadly" autocomplete="off" aria-label="Search"></form>
+  <a class="btn" href="#/submit" id="newpost">＋ Post</a>
+  <div id="who"></div>
+</header>
+<div id="wrap"><nav id="nav"></nav><main id="main"></main><aside id="side"></aside></div>
+<div id="modal"></div><div id="toast"></div>
+<noscript><p style="padding:20px">Threadly needs JavaScript.</p></noscript>
+<script src="config.js"></script>
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const canStore = (() => { try { localStorage.setItem('tl_t', '1'); localStorage.removeItem('tl_t'); return true; } catch (e) { return false; } })();
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+const ST = Object.assign({ theme: 'auto', filter: true, sort: 'hot', server: null }, store.get('tl_settings', {}));
+const saveST = () => store.set('tl_settings', ST);
+const CFG = window.THREADLY || {};
+if (!ST.server && CFG.url && CFG.key) ST.server = { url: CFG.url, key: CFG.key };
+const dark = matchMedia('(prefers-color-scheme: dark)');
+const applyTheme = () => { document.documentElement.dataset.theme = ST.theme === 'auto' ? (dark.matches ? 'dark' : 'light') : ST.theme; };
+applyTheme(); dark.addEventListener && dark.addEventListener('change', applyTheme);
+const ago = t => { const s = (Date.now() - t) / 1000; if (s < 60) return 'just now'; const m = s / 60; if (m < 60) return Math.floor(m) + 'm ago'; const h = m / 60; if (h < 24) return Math.floor(h) + 'h ago'; const d = h / 24; if (d < 30) return Math.floor(d) + 'd ago'; const mo = d / 30; if (mo < 12) return Math.floor(mo) + 'mo ago'; return Math.floor(d / 365) + 'y ago'; };
+const fmtN = n => Math.abs(n) >= 10000 ? (n / 1000).toFixed(0) + 'k' : Math.abs(n) >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
+const hue = s => { let h = 0; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+const av = (n, sz = 28) => `<span class="av" style="width:${sz}px;height:${sz}px;background:hsl(${hue(n)},55%,46%);font-size:${Math.round(sz * .5)}px">${esc(String(n)[0].toUpperCase())}</span>`;
+const cdot = (n, sz) => `<span class="cdot" style="${sz ? `width:${sz}px;height:${sz}px;` : ''}background:hsl(${hue(n)},55%,46%)">${esc(n[0].toUpperCase())}</span>`;
+const NAME = /^[A-Za-z0-9_]{3,20}$/, CNAME = /^[A-Za-z0-9_]{3,21}$/;
+function md(s) {
+  let t = esc(s);
+  t = t.replace(/`([^`\n]+)`/g, '<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<i>$2</i>');
+  t = t.replace(/(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g, '<a href="$1" target="_blank" rel="noopener noreferrer nofollow">$1</a>');
+  let out = '', list = false;
+  for (const ln of t.split('\n')) {
+    if (/^\s*[-*] /.test(ln)) { if (!list) { out += '<ul>'; list = true; } out += '<li>' + ln.replace(/^\s*[-*] /, '') + '</li>'; continue; }
+    if (list) { out += '</ul>'; list = false; }
+    out += /^&gt; ?/.test(ln) ? '<blockquote>' + ln.replace(/^&gt; ?/, '') + '</blockquote>' : (ln.trim() ? '<p>' + ln + '</p>' : '');
+  }
+  return out + (list ? '</ul>' : '');
+}
+const plain = s => String(s).replace(/[`*>_#]/g, '').replace(/\s+/g, ' ').trim();
+const BAD = /\b(fuck\w*|shit\w*|bitch\w*|asshole|bastard|cunt|slut|whore|nigg\w+|fag\w*|retard\w*|porn\w*|nudes?)\b/i;
+const clean = (...t) => !ST.filter || !t.some(x => BAD.test(x || ''));
+const FRIENDLY = 'Please keep it friendly: that contains a word that is not allowed here.';
+const okUrl = u => /^https?:\/\//i.test(u || '');
+const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2800); };
+function modal(html) { const m = $('#modal'); m.innerHTML = `<div class="ov"><div class="box" role="dialog" aria-modal="true">${html}</div></div>`; m.classList.add('on'); const f = $('input,textarea,select', m); if (f) setTimeout(() => f.focus(), 30); }
+const closeModal = () => { $('#modal').classList.remove('on'); $('#modal').innerHTML = ''; };
+function ask(msg, ok = 'OK') { return new Promise(res => { modal(`<h3>${esc(msg)}</h3><div class="btns"><button class="btn ghost" id="mNo">Cancel</button><button class="btn danger" id="mYes">${esc(ok)}</button></div>`); $('#mNo').onclick = () => { closeModal(); res(false); }; $('#mYes').onclick = () => { closeModal(); res(true); }; }); }
+function shrink(file) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onerror = () => rej(new Error('Could not read that file'));
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = () => rej(new Error('That file is not a picture'));
+      im.onload = () => {
+        let max = 1000, q = .72;
+        for (let i = 0; i < 4; i++) {
+          const sc = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          const d = c.toDataURL('image/jpeg', q);
+          if (d.length < 380000 || i === 3) return res(d);
+          max *= .75; q -= .08;
+        }
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- data layer 1: Local (demo mode, saved only on this device) ---------- */
+const Local = (() => {
+  const H = 3600000;
+  let D = store.get('tl_db', null);
+  const SEED_C = [
+    ['gaming', 'Gaming', 'Talk about video games, tips and clips.', 'pixel_pete', 4210],
+    ['minecraft', 'Minecraft Builders', 'Show off your builds, farms and redstone.', 'blockbuilder9', 3180],
+    ['science', 'Science', 'Cool facts, experiments and discoveries.', 'curious_cat', 5120],
+    ['funny', 'Funny', 'Clean jokes and funny stories.', 'jokester_jo', 6240],
+    ['art', 'Art and Drawing', 'Share your drawings and get friendly feedback.', 'sketchy_sam', 2150],
+    ['pets', 'Pets', 'Dogs, cats, hamsters and everything in between.', 'whisker_wiz', 3890],
+    ['school', 'School Help', 'Homework help and study tips.', 'study_buddy', 2760],
+    ['askthreadly', 'Ask Threadly', 'Ask anything. Get answers from the community.', 'new_here', 1980],
+    ['music', 'Music', 'Songs, instruments and learning to play.', 'beat_boxer', 1430],
+    ['tech', 'Tech and Coding', 'Apps, websites and learning to code.', 'code_fox', 3320]
+  ];
+  const SEED_P = [
+    ['gaming', 'pixel_pete', "What's the best game you played this year?", 'I keep going back to open world games. Tell me yours and why!', 5, 128],
+    ['minecraft', 'blockbuilder9', 'Built a castle with a secret library inside', 'Took me 3 weekends. The trick is using **stairs and trapdoors** for the bookshelves.\n\nAny tips for a moat that does not leak?', 9, 342],
+    ['science', 'curious_cat', 'A day on Venus is longer than its year', 'Venus spins so slowly that one day (243 Earth days) is longer than its trip around the Sun (225 Earth days).', 20, 890],
+    ['funny', 'jokester_jo', 'Why did the computer go to the doctor?', 'Because it had a virus! 😄\n\nWhat is your best clean joke?', 3, 210],
+    ['art', 'sketchy_sam', 'Drew my dog as a superhero', 'First time trying digital shading. Be honest, what should I improve?', 14, 77],
+    ['pets', 'whisker_wiz', 'My cat learned to open doors', 'Now nothing is safe. Does anyone know how to stop this? 😂', 30, 505],
+    ['school', 'study_buddy', 'How I remember maths formulas (3 tricks)', '- Write them on sticky notes\n- Explain the formula to someone else\n- Make up a silly song\n\nWorks for me!', 40, 260],
+    ['askthreadly', 'new_here', 'What should I name my first app?', 'It is a notes app for school. Ideas welcome!', 2, 14],
+    ['music', 'beat_boxer', 'Learning guitar: what songs are easy for beginners?', 'Just got a guitar for my birthday!', 11, 63],
+    ['tech', 'code_fox', 'Tip: learn HTML, then CSS, then JavaScript', 'Build tiny projects as you go: a button counter, a to-do list, a quiz. Projects teach more than videos.', 50, 412],
+    ['gaming', 'retro_rhea', 'Underrated games from 10 years ago', "Let's make a list! I'll start with Journey.", 70, 95],
+    ['science', 'lab_lemon', 'Easy volcano experiment at home', 'Baking soda + vinegar + a drop of dish soap makes foamy lava. Do it outside or in a tray!', 100, 301],
+    ['funny', 'jokester_jo', 'I told my plant a joke...', 'It really grew on me.', 120, 150],
+    ['minecraft', 'redstone_ria', 'Auto farm that never breaks', 'Sharing my design in the comments. Works in the latest version!', 6, 187]
+  ];
+  const SEED_M = [ // [post index, parent comment index or -1, author, text, hours ago, base score]
+    [0, -1, 'retro_rhea', 'Hollow Knight for me. The music alone is worth it.', 4, 41],
+    [0, 0, 'pixel_pete', 'Great pick! Did you finish the Pantheons?', 3, 12],
+    [0, 1, 'retro_rhea', 'Not yet, those bosses are brutal.', 2, 6],
+    [0, -1, 'blockbuilder9', 'Minecraft, still. I find something new every month.', 4, 28],
+    [1, -1, 'redstone_ria', 'Use sponges or dig the moat in two layers and fill the edge with glass first.', 8, 54],
+    [1, -1, 'curious_cat', 'This looks amazing. Is the library connected to a tower?', 7, 19],
+    [2, -1, 'lab_lemon', 'And a day on Mercury lasts about 176 Earth days. Space is weird!', 18, 120],
+    [7, -1, 'code_fox', 'Something short like "Notely" or "StudyPad".', 1, 9],
+    [7, 0, 'new_here', 'StudyPad is nice! Thank you!', 1, 4],
+    [5, -1, 'study_buddy', 'Lever-style handles are the problem. Round knobs are cat-proof.', 29, 88]
+  ];
+  const save = () => { if (!store.set('tl_db', D) && canStore) throw new Error('This device is out of storage space. Use a smaller picture, or reset the demo data in Settings.'); };
+  function seed() {
+    const now = Date.now();
+    D = { users: {}, communities: {}, members: {}, posts: [], comments: [], votes: {}, saved: {}, reports: [], nid: 1, session: null };
+    SEED_C.forEach(([n, t, d, cr, m]) => D.communities[n] = { name: n, title: t, desc: d, creator: cr, created: now - 90 * 24 * H, mem: m });
+    SEED_P.forEach(([c, a, t, b, h, s]) => D.posts.push({ id: D.nid++, community: c, author: a, title: t, body: b, url: '', image: '', created: now - h * H, base: s }));
+    const ids = [];
+    SEED_M.forEach(([pi, par, a, b, h, s]) => { const id = D.nid++; ids.push(id); D.comments.push({ id, post: D.posts[pi].id, parent: par < 0 ? 0 : ids[par], author: a, body: b, created: now - h * H, base: s }); });
+    save();
+  }
+  if (!D || !D.posts) seed();
+  const me = () => D.session;
+  const tally = () => { const t = {}; for (const k in D.votes) { const [, kind, id] = k.split('|'); t[kind + id] = (t[kind + id] || 0) + D.votes[k]; } return t; };
+  const findUser = n => Object.keys(D.users).find(k => k.toLowerCase() === String(n).toLowerCase());
+  const needLogin = () => { if (!me()) throw new Error('Please log in first'); };
+  const decP = (p, T, cc, sv) => ({ id: p.id, community: p.community, author: p.author, title: p.title, body: p.body, url: p.url, image: p.image, created: p.created, score: p.base + (T['p' + p.id] || 0), comments: cc[p.id] || 0, myVote: D.votes[me() + '|p|' + p.id] || 0, saved: sv.includes(p.id) });
+  const decC = (c, T) => ({ id: c.id, post_id: c.post, parent_id: c.parent, author: c.author, body: c.body, created: c.created, score: c.base + (T['c' + c.id] || 0), myVote: D.votes[me() + '|c|' + c.id] || 0 });
+  const posts = async (o = {}) => {
+    const T = tally(), cc = {}, sv = D.saved[me()] || [];
+    D.comments.forEach(c => cc[c.post] = (cc[c.post] || 0) + 1);
+    const q = (o.q || '').toLowerCase();
+    return D.posts.filter(p => (!o.community || p.community === o.community) && (!o.communities || o.communities.includes(p.community)) && (!o.author || p.author === o.author) && (!o.ids || o.ids.includes(p.id)) && (!q || (p.title + ' ' + p.body).toLowerCase().includes(q))).map(p => decP(p, T, cc, sv)).sort((a, b) => b.created - a.created);
+  };
+  const dropComments = ids => { D.comments = D.comments.filter(c => !ids.includes(c.id)); ids.forEach(id => delete D.votes[me() + '|c|' + id]); for (const k in D.votes) { const s = k.split('|'); if (s[1] === 'c' && ids.includes(+s[2])) delete D.votes[k]; } };
+  return {
+    kind: 'local',
+    async me() { return me() ? { username: me() } : null; },
+    async signUp(u, p) {
+      if (!NAME.test(u)) throw new Error('Username: 3 to 20 letters, numbers or _');
+      if (p.length < 6) throw new Error('Password must be at least 6 characters');
+      if (findUser(u) || SEED_P.some(x => x[1].toLowerCase() === u.toLowerCase())) throw new Error('That username is already taken');
+      D.users[u] = { pw: hash(p), created: Date.now() }; D.session = u; save();
+    },
+    async signIn(u, p) { const k = findUser(u); if (!k || D.users[k].pw !== hash(p)) throw new Error('Wrong username or password'); D.session = k; save(); },
+    async signOut() { D.session = null; save(); },
+    async communities() { return Object.values(D.communities).map(c => ({ name: c.name, title: c.title, desc: c.desc, creator: c.creator, created: c.created, members: c.mem + Object.values(D.members).filter(a => a.includes(c.name)).length })).sort((a, b) => b.members - a.members); },
+    async joined() { return me() ? (D.members[me()] || []).slice() : []; },
+    async createCommunity(n, t, d) {
+      needLogin();
+      if (!CNAME.test(n)) throw new Error('Community name: 3 to 21 letters, numbers or _');
+      if (Object.keys(D.communities).some(k => k.toLowerCase() === n.toLowerCase())) throw new Error('That community already exists');
+      D.communities[n] = { name: n, title: t || n, desc: d || '', creator: me(), created: Date.now(), mem: 0 }; (D.members[me()] = D.members[me()] || []).push(n); save();
+    },
+    async join(n) { needLogin(); const a = D.members[me()] = D.members[me()] || []; if (!a.includes(n)) a.push(n); save(); },
+    async leave(n) { needLogin(); D.members[me()] = (D.members[me()] || []).filter(x => x !== n); save(); },
+    posts,
+    async savedIds() { return (D.saved[me()] || []).slice(); },
+    async addPost(p) {
+      needLogin(); const id = D.nid++;
+      D.posts.push({ id, community: p.community, author: me(), title: p.title, body: p.body || '', url: p.url || '', image: p.image || '', created: Date.now(), base: 0 });
+      D.votes[me() + '|p|' + id] = 1; save(); return id;
+    },
+    async delPost(id) { D.posts = D.posts.filter(p => p.id !== id); dropComments(D.comments.filter(c => c.post === id).map(c => c.id)); for (const k in D.votes) { const s = k.split('|'); if (s[1] === 'p' && +s[2] === id) delete D.votes[k]; } for (const u in D.saved) D.saved[u] = D.saved[u].filter(x => x !== id); save(); },
+    async comments(pid) { const T = tally(); return D.comments.filter(c => c.post === pid).map(c => decC(c, T)); },
+    async addComment(pid, parent, body) { needLogin(); const id = D.nid++; D.comments.push({ id, post: pid, parent: parent || 0, author: me(), body, created: Date.now(), base: 0 }); D.votes[me() + '|c|' + id] = 1; save(); },
+    async delComment(id) { const all = [id]; for (let i = 0; i < all.length; i++) D.comments.forEach(c => { if (c.parent === all[i] && !all.includes(c.id)) all.push(c.id); }); dropComments(all); save(); },
+    async vote(kind, id, v) { needLogin(); const k = me() + '|' + kind + '|' + id; if (v === 0) delete D.votes[k]; else D.votes[k] = v; save(); },
+    async save(id, on) { needLogin(); const a = D.saved[me()] = D.saved[me()] || []; const i = a.indexOf(id); if (on && i < 0) a.push(id); if (!on && i >= 0) a.splice(i, 1); save(); },
+    async report(kind, id, reason) { needLogin(); D.reports.push({ by: me(), kind, id, reason, at: Date.now() }); save(); },
+    async userInfo(n) {
+      const T = tally(), cc = {}, ps = D.posts.filter(p => p.author === n), cs = D.comments.filter(c => c.author === n), u = D.users[n];
+      if (!u && !ps.length && !cs.length) return null;
+      const karma = ps.reduce((s, p) => s + p.base + (T['p' + p.id] || 0), 0) + cs.reduce((s, c) => s + c.base + (T['c' + c.id] || 0), 0);
+      return { name: n, karma, created: u ? u.created : Math.min(...ps.map(p => p.created), ...cs.map(c => c.created)), posts: ps.length, comments: cs.length };
+    },
+    async userComments(n) { const T = tally(); return D.comments.filter(c => c.author === n).map(c => { const p = D.posts.find(x => x.id === c.post) || {}; return Object.assign(decC(c, T), { postTitle: p.title || '', community: p.community || '' }); }).sort((a, b) => b.created - a.created); },
+    reset() { store.del('tl_db'); }
+  };
+  function hash(s) { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return String(h); }
+})();
+
+/* ---------- data layer 2: Remote (your own free Supabase server, shared by everyone) ---------- */
+const Remote = (() => {
+  const U = () => ST.server.url.replace(/\/+$/, ''), K = () => ST.server.key;
+  let S = store.get('tl_sess', null); // { access, refresh, exp, uid, username }
+  const enc = encodeURIComponent, Q = s => String(s).replace(/[,()*%\\"]/g, ' ');
+  const kindName = k => k === 'p' ? 'post' : 'comment';
+  const mail = u => u.toLowerCase() + '@threadly-app.com';
+  async function raw(path, { method = 'GET', body, prefer, token } = {}) {
+    const r = await fetch(U() + path, { method, headers: Object.assign({ apikey: K(), Authorization: 'Bearer ' + (token || K()), 'Content-Type': 'application/json' }, prefer ? { Prefer: prefer } : {}), body: body === undefined ? undefined : JSON.stringify(body) });
+    const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) {}
+    if (!r.ok) throw new Error((j && (j.message || j.msg || j.error_description || j.error)) || ('Server error ' + r.status));
+    return j;
+  }
+  async function refresh() { const j = await raw('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: S.refresh } }); setSess(j, S.username); }
+  function setSess(j, username) { S = { access: j.access_token, refresh: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000, uid: j.user.id, username }; store.set('tl_sess', S); }
+  async function api(path, o = {}) {
+    let token = K();
+    if (S) { if (Date.now() > S.exp - 60000) { try { await refresh(); } catch (e) { S = null; store.del('tl_sess'); } } if (S) token = S.access; }
+    return raw(path, Object.assign({ token }, o));
+  }
+  const need = () => { if (!S) throw new Error('Please log in first'); };
+  const T = t => Date.parse(t) || Date.now();
+  const mapP = r => ({ id: r.id, community: r.community, author: r.author, title: r.title, body: r.body || '', url: r.url || '', image: r.image || '', created: T(r.created), score: r.score || 0, comments: r.comments || 0, myVote: 0, saved: false });
+  const mapC = r => ({ id: r.id, post_id: r.post_id, parent_id: r.parent_id || 0, author: r.author, body: r.body, created: T(r.created), score: r.score || 0, myVote: 0 });
+  async function myVotes(kind, ids) { if (!S || !ids.length) return {}; const rows = await api('/rest/v1/votes?kind=eq.' + kindName(kind) + '&target=in.(' + ids.join(',') + ')&select=target,value'); const m = {}; rows.forEach(r => m[r.target] = r.value); return m; }
+  return {
+    kind: 'remote',
+    async me() { return S ? { username: S.username, id: S.uid } : null; },
+    async signUp(u, p) {
+      if (!NAME.test(u)) throw new Error('Username: 3 to 20 letters, numbers or _');
+      if (p.length < 6) throw new Error('Password must be at least 6 characters');
+      const j = await raw('/auth/v1/signup', { method: 'POST', body: { email: mail(u), password: p } });
+      if (!j || !j.access_token) throw new Error('Sign-up needs "Confirm email" switched OFF in Supabase (Authentication > Providers > Email).');
+      setSess(j, u);
+      try { await api('/rest/v1/profiles', { method: 'POST', body: { id: S.uid, username: u } }); } catch (e) { S = null; store.del('tl_sess'); throw new Error(/duplicate|unique/i.test(e.message) ? 'That username is already taken' : e.message); }
+    },
+    async signIn(u, p) {
+      const j = await raw('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: mail(u), password: p } }).catch(e => { throw new Error(/invalid/i.test(e.message) ? 'Wrong username or password' : e.message); });
+      const rows = await raw('/rest/v1/profiles?id=eq.' + j.user.id + '&select=username', { token: j.access_token });
+      if (!rows.length) throw new Error('This account has no profile yet');
+      setSess(j, rows[0].username);
+    },
+    async signOut() { S = null; store.del('tl_sess'); },
+    async communities() { const rows = await api('/rest/v1/communities_v?select=*&order=members.desc&limit=500'); return rows.map(r => ({ name: r.name, title: r.title, desc: r.description || '', creator: r.creator, created: T(r.created), members: r.members || 0 })); },
+    async joined() { if (!S) return []; return (await api('/rest/v1/members?user_id=eq.' + S.uid + '&select=community')).map(r => r.community); },
+    async createCommunity(n, t, d) {
+      need(); if (!CNAME.test(n)) throw new Error('Community name: 3 to 21 letters, numbers or _');
+      await api('/rest/v1/communities', { method: 'POST', body: { name: n, title: t || n, description: d || '', creator: S.uid } }).catch(e => { throw new Error(/duplicate|unique/i.test(e.message) ? 'That community already exists' : e.message); });
+      await api('/rest/v1/members', { method: 'POST', body: { user_id: S.uid, community: n } });
+    },
+    async join(n) { need(); await api('/rest/v1/members?on_conflict=user_id,community', { method: 'POST', prefer: 'resolution=ignore-duplicates', body: { user_id: S.uid, community: n } }); },
+    async leave(n) { need(); await api('/rest/v1/members?user_id=eq.' + S.uid + '&community=eq.' + enc(n), { method: 'DELETE' }); },
+    async posts(o = {}) {
+      let q = '/rest/v1/posts_v?select=*&order=created.desc&limit=300';
+      if (o.community) q += '&community=eq.' + enc(o.community);
+      if (o.communities) { if (!o.communities.length) return []; q += '&community=in.(' + o.communities.map(enc).join(',') + ')'; }
+      if (o.author) q += '&author=eq.' + enc(o.author);
+      if (o.ids) { if (!o.ids.length) return []; q += '&id=in.(' + o.ids.join(',') + ')'; }
+      if (o.q) { const s = enc(Q(o.q).trim()); q += '&or=(title.ilike.*' + s + '*,body.ilike.*' + s + '*)'; }
+      const L = (await api(q)).map(mapP), ids = L.map(p => p.id);
+      if (S && ids.length) {
+        const [mv, sv] = await Promise.all([myVotes('p', ids), api('/rest/v1/saved?post_id=in.(' + ids.join(',') + ')&select=post_id')]);
+        const ss = new Set(sv.map(r => r.post_id)); L.forEach(p => { p.myVote = mv[p.id] || 0; p.saved = ss.has(p.id); });
+      }
+      return L;
+    },
+    async savedIds() { if (!S) return []; return (await api('/rest/v1/saved?select=post_id&order=created.desc&limit=300')).map(r => r.post_id); },
+    async addPost(p) {
+      need();
+      const r = await api('/rest/v1/posts', { method: 'POST', prefer: 'return=representation', body: { community: p.community, author: S.uid, title: p.title, body: p.body || '', url: p.url || '', image: p.image || '' } });
+      const id = r[0].id; try { await this.vote('p', id, 1); } catch (e) {} return id;
+    },
+    async delPost(id) { await api('/rest/v1/posts?id=eq.' + id, { method: 'DELETE' }); },
+    async comments(pid) {
+      const L = (await api('/rest/v1/comments_v?post_id=eq.' + pid + '&order=created.asc&limit=1000')).map(mapC);
+      const mv = await myVotes('c', L.map(c => c.id)); L.forEach(c => c.myVote = mv[c.id] || 0); return L;
+    },
+    async addComment(pid, parent, body) {
+      need(); const r = await api('/rest/v1/comments', { method: 'POST', prefer: 'return=representation', body: { post_id: pid, parent_id: parent || null, author: S.uid, body } });
+      try { await this.vote('c', r[0].id, 1); } catch (e) {}
+    },
+    async delComment(id) { await api('/rest/v1/comments?id=eq.' + id, { method: 'DELETE' }); },
+    async vote(kind, id, v) {
+      need();
+      if (v === 0) await api('/rest/v1/votes?user_id=eq.' + S.uid + '&kind=eq.' + kindName(kind) + '&target=eq.' + id, { method: 'DELETE' });
+      else await api('/rest/v1/votes?on_conflict=user_id,kind,target', { method: 'POST', prefer: 'resolution=merge-duplicates', body: { user_id: S.uid, kind: kindName(kind), target: id, value: v } });
+    },
+    async save(id, on) {
+      need();
+      if (on) await api('/rest/v1/saved?on_conflict=user_id,post_id', { method: 'POST', prefer: 'resolution=ignore-duplicates', body: { user_id: S.uid, post_id: id } });
+      else await api('/rest/v1/saved?user_id=eq.' + S.uid + '&post_id=eq.' + id, { method: 'DELETE' });
+    },
+    async report(kind, id, reason) { need(); await api('/rest/v1/reports', { method: 'POST', body: { user_id: S.uid, kind: kindName(kind), target: id, reason } }); },
+    async userInfo(n) {
+      const pr = await api('/rest/v1/profiles?username=eq.' + enc(n) + '&select=username,created'); if (!pr.length) return null;
+      const [ps, cs] = await Promise.all([api('/rest/v1/posts_v?author=eq.' + enc(n) + '&select=score&limit=1000'), api('/rest/v1/comments_v?author=eq.' + enc(n) + '&select=score&limit=1000')]);
+      return { name: pr[0].username, karma: ps.reduce((s, r) => s + (r.score || 0), 0) + cs.reduce((s, r) => s + (r.score || 0), 0), created: T(pr[0].created), posts: ps.length, comments: cs.length };
+    },
+    async userComments(n) {
+      const L = (await api('/rest/v1/comments_v?author=eq.' + enc(n) + '&order=created.desc&limit=100')).map(mapC);
+      const ids = [...new Set(L.map(c => c.post_id))]; const pm = {};
+      if (ids.length) (await api('/rest/v1/posts_v?id=in.(' + ids.join(',') + ')&select=id,title,community')).forEach(p => pm[p.id] = p);
+      return L.map(c => Object.assign(c, { postTitle: (pm[c.post_id] || {}).title || '', community: (pm[c.post_id] || {}).community || '' }));
+    },
+    async ping(url, key) { // used by Settings to test a server before switching to it
+      const r = await fetch(url.replace(/\/+$/, '') + '/rest/v1/communities_v?select=name&limit=1', { headers: { apikey: key, Authorization: 'Bearer ' + key } });
+      return r.status;
+    }
+  };
+})();
+
+const DB = (ST.server && ST.server.url && ST.server.key) ? Remote : Local;
+
+/* ---------- app state ---------- */
+let ME = null, COMMS = [], JOINED = new Set(), SORT = ST.sort || 'hot', FEED = { posts: [], shown: 25, empty: '' }, CUR = null, routeId = 0, installEv = null;
+const main = $('#main');
+const comm = n => COMMS.find(c => c.name === n);
+const isMod = n => !!(ME && comm(n) && comm(n).creator === ME.username);
+async function loadMeta() {
+  ME = await DB.me();
+  [COMMS, JOINED] = await Promise.all([DB.communities().catch(() => []), DB.joined().catch(() => [])]);
+  JOINED = new Set(JOINED);
+  paintTop(); paintNav(); paintSide();
+}
+function paintTop() {
+  $('#who').innerHTML = ME ? `<a class="nm" href="#/u/${ME.username}">${av(ME.username, 30)}<span>${esc(ME.username)}</span></a><button class="btn ghost sm" data-act="logout">Log out</button>` : `<button class="btn ghost" data-act="login">Log in</button>`;
+}
+function paintNav() {
+  const h = location.hash || '#/', on = p => (h === p || (p === '#/' && h === '')) ? 'on' : '';
+  const mine = COMMS.filter(c => JOINED.has(c.name)), top = COMMS.filter(c => !JOINED.has(c.name)).slice(0, 8);
+  const cl = c => `<a href="#/c/${c.name}" class="${h === '#/c/' + c.name ? 'on' : ''}">${cdot(c.name)}<span>c/${esc(c.name)}</span></a>`;
+  $('#nav').innerHTML = `<a href="#/" class="${on('#/')}">🏠 Home</a><a href="#/popular" class="${on('#/popular')}">🔥 Popular</a><a href="#/saved" class="${on('#/saved')}">🔖 Saved</a>
+    ${mine.length ? '<h4>Your communities</h4>' + mine.map(cl).join('') : ''}<h4>${mine.length ? 'More communities' : 'Communities'}</h4>${top.map(cl).join('')}
+    <h4>More</h4><a href="#/new-community" class="${on('#/new-community')}">➕ Create a community</a><a href="#/settings" class="${on('#/settings')}">⚙️ Settings</a>${installEv ? '<button data-act="install">📲 Install the app</button>' : ''}`;
+}
+function paintSide() {
+  const top = COMMS.slice(0, 5);
+  $('#side').innerHTML = `<div class="card"><h3>Trending communities</h3>${top.map(c => `<a class="side-c" href="#/c/${c.name}">${cdot(c.name, 30)}<span class="grow"><b>c/${esc(c.name)}</b><br><span class="hint">${fmtN(c.members)} members</span></span></a>`).join('') || '<span class="hint">None yet</span>'}<a class="btn wide" href="#/new-community">Create a community</a></div>
+    <div class="card hint">${DB.kind === 'local' ? '🟠 <b>Demo mode</b>: posts are saved only on this device. <a href="#/settings" style="text-decoration:underline">Connect a server</a> so friends can join.' : '🟢 Online: shared with everyone on your server.'}<br><br><a href="privacy.html" style="text-decoration:underline">Privacy</a> · <a href="#/settings" style="text-decoration:underline">Settings</a></div>`;
+}
+function need() { if (ME) return true; loginModal(); return false; }
+
+/* ---------- cards ---------- */
+function postCard(p, full) {
+  const c = comm(p.community), mod = ME && (ME.username === p.author || isMod(p.community));
+  const pic = p.image && p.image.startsWith('data:image/') ? `<img src="${p.image}" alt="" loading="lazy">` : '';
+  const img = pic ? (full ? `<span class="pimg">${pic}</span>` : `<a href="#/post/${p.id}" class="pimg">${pic}</a>`) : '';
+  let link = '';
+  if (okUrl(p.url)) { let h = p.url; try { h = new URL(p.url).hostname.replace(/^www\./, ''); } catch (e) {} link = `<a class="plink" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer nofollow">🔗 ${esc(h)}</a>`; }
+  const text = p.body ? (full ? `<div class="body">${md(p.body)}</div>` : `<div class="snip">${esc(plain(p.body).slice(0, 220))}${plain(p.body).length > 220 ? '…' : ''}</div>`) : '';
+  return `<article class="post" data-pid="${p.id}"><div class="votes" data-vk="p" data-id="${p.id}" data-my="${p.myVote}"><button class="up" data-act="vote" data-v="1" aria-label="Upvote">▲</button><span class="sc" data-s="${p.score}">${fmtN(p.score)}</span><button class="down" data-act="vote" data-v="-1" aria-label="Downvote">▼</button></div>
+  <div class="pbody"><div class="meta"><a class="c" href="#/c/${esc(p.community)}">c/${esc(p.community)}</a><span>·</span><span>Posted by <a href="#/u/${esc(p.author)}">u/${esc(p.author)}</a></span><span>·</span><span>${ago(p.created)}</span></div>
+  <h3>${full ? esc(p.title) : `<a href="#/post/${p.id}">${esc(p.title)}</a>`}</h3>${img}${link}${text}
+  <div class="acts"><a href="#/post/${p.id}">💬 ${p.comments} comment${p.comments === 1 ? '' : 's'}</a><button data-act="share" data-id="${p.id}">↗ Share</button><button data-act="save" data-id="${p.id}" class="${p.saved ? 'on' : ''}">${p.saved ? '🔖 Saved' : '🔖 Save'}</button>${mod ? `<button data-act="delpost" data-id="${p.id}">🗑 Delete</button>` : ''}${ME && ME.username !== p.author ? `<button data-act="report" data-k="p" data-id="${p.id}">⚑ Report</button>` : ''}</div></div></article>`;
+}
+function commentTree(list) {
+  const by = {}; list.forEach(c => (by[c.parent_id || 0] = by[c.parent_id || 0] || []).push(c));
+  Object.values(by).forEach(a => a.sort((x, y) => y.score - x.score || x.created - y.created));
+  const ids = new Set(list.map(c => c.id)), roots = list.filter(c => c.parent_id && !ids.has(c.parent_id)); // orphans show at the top level
+  (by[0] = by[0] || []).push(...roots);
+  const mp = CUR ? isMod(CUR.post.community) : false;
+  const one = (c, depth) => `<div class="cm" id="c${c.id}"><div class="cvote" data-vk="c" data-id="${c.id}" data-my="${c.myVote}"><button class="up" data-act="vote" data-v="1" aria-label="Upvote">▲</button><span class="sc" data-s="${c.score}">${fmtN(c.score)}</span><button class="down" data-act="vote" data-v="-1" aria-label="Downvote">▼</button></div>
+    <div class="cmain"><div class="cmeta">${av(c.author, 20)}<a class="u" href="#/u/${esc(c.author)}">u/${esc(c.author)}</a><span>·</span><span>${ago(c.created)}</span><button data-act="fold" class="hint" aria-label="Collapse">[–]</button></div>
+    <div class="cbody body">${md(c.body)}</div><div class="cact"><button data-act="reply" data-id="${c.id}">Reply</button>${ME && (ME.username === c.author || mp) ? `<button data-act="delcm" data-id="${c.id}">Delete</button>` : ''}${ME && ME.username !== c.author ? `<button data-act="report" data-k="c" data-id="${c.id}">Report</button>` : ''}</div>
+    <div class="reply"></div><div class="kids ${depth >= 5 ? 'flat' : ''}">${(by[c.id] || []).map(k => one(k, depth + 1)).join('')}</div></div></div>`;
+  return (by[0] || []).map(c => one(c, 0)).join('');
+}
+
+/* ---------- views ---------- */
+const sortBar = () => `<div class="sorts">${['hot', 'new', 'top'].map(s => `<button class="chip ${SORT === s ? 'on' : ''}" data-act="sort" data-s="${s}">${{ hot: '🔥 Hot', new: '✨ New', top: '🏆 Top' }[s]}</button>`).join('')}<button class="chip" data-act="refresh" title="Refresh">↻</button></div>`;
+const hotScore = p => Math.sign(p.score) * Math.log10(Math.max(Math.abs(p.score), 1)) + p.created / 1000 / 45000;
+function sortPosts(a) { const L = a.slice(); if (SORT === 'new') L.sort((x, y) => y.created - x.created); else if (SORT === 'top') L.sort((x, y) => y.score - x.score || y.created - x.created); else L.sort((x, y) => hotScore(y) - hotScore(x)); return L; }
+function paintFeed() {
+  const el = $('#list'); if (!el) return; const L = sortPosts(FEED.posts);
+  el.innerHTML = L.length ? L.slice(0, FEED.shown).map(p => postCard(p)).join('') + (L.length > FEED.shown ? '<button class="btn ghost wide" data-act="more">Show more posts</button>' : '') : `<div class="card muted center">${FEED.empty}</div>`;
+  $$('.sorts .chip[data-s]').forEach(b => b.classList.toggle('on', b.dataset.s === SORT));
+}
+async function feedPage(head, query, empty, rid) {
+  main.innerHTML = head + sortBar() + '<div id="list"><div class="card muted">Loading…</div></div>';
+  const posts = await DB.posts(query); if (rid !== routeId) return;
+  FEED = { posts, shown: 25, empty }; paintFeed();
+}
+const notFound = (what = 'page') => { main.innerHTML = `<div class="card center"><h2>Nothing here</h2><p class="muted">We could not find that ${what}.</p><a class="btn" href="#/">Go home</a></div>`; };
+const homeHead = (t, s) => `<div class="card"><h2>${t}</h2><div class="muted">${s}</div></div>`;
+
+async function viewHome(rid) {
+  const mine = [...JOINED];
+  if (ME && mine.length) return feedPage(homeHead('🏠 Home', 'Posts from your communities'), { communities: mine }, 'No posts in your communities yet. Be the first to post!', rid);
+  return feedPage(homeHead('🏠 Home', ME ? 'Join some communities (left menu) to fill your home feed. Here are the popular posts.' : 'Welcome to Threadly! Log in to post, vote and comment.'), {}, 'No posts yet.', rid);
+}
+const viewPopular = rid => feedPage(homeHead('🔥 Popular', 'The most upvoted posts from every community'), {}, 'No posts yet.', rid);
+async function viewSaved(rid) {
+  if (!ME) { main.innerHTML = '<div class="card center"><h2>🔖 Saved posts</h2><p class="muted">Log in to save posts.</p><button class="btn" data-act="login">Log in</button></div>'; return; }
+  const ids = await DB.savedIds(); if (rid !== routeId) return;
+  return feedPage(homeHead('🔖 Saved', 'Posts you saved'), { ids }, 'You have not saved anything yet. Tap Save under a post.', rid);
+}
+async function viewCommunity(name, rid) {
+  const c = comm(name); if (!c) return notFound('community');
+  document.title = 'c/' + name + ' · Threadly';
+  const joined = JOINED.has(name);
+  const head = `<div class="card"><div class="banner" style="background:linear-gradient(120deg,hsl(${hue(name)},60%,38%),hsl(${(hue(name) + 60) % 360},60%,30%))"></div><div class="chead">${cdot(name)}<div class="grow"><h2 style="margin:0">${esc(c.title)}</h2><div class="muted">c/${esc(name)} · ${fmtN(c.members)} member${c.members === 1 ? '' : 's'}${c.creator ? ' · made by u/' + esc(c.creator) : ''}</div></div>
+    <a class="btn ghost" href="#/submit?c=${name}">＋ Post</a><button class="btn ${joined ? 'ghost' : ''}" data-act="${joined ? 'leave' : 'join'}" data-c="${name}">${joined ? 'Joined ✓' : 'Join'}</button></div>${c.desc ? `<p style="margin:12px 0 0">${esc(c.desc)}</p>` : ''}${isMod(name) ? '<p class="hint" style="margin:8px 0 0">🛡 You made this community, so you can delete posts and comments in it.</p>' : ''}</div>`;
+  return feedPage(head, { community: name }, 'No posts here yet. Be the first to post!', rid);
+}
+async function viewPost(id, rid) {
+  main.innerHTML = '<div class="card muted">Loading…</div>';
+  const [ps, cm] = await Promise.all([DB.posts({ ids: [id] }), DB.comments(id)]); if (rid !== routeId) return;
+  if (!ps.length) return notFound('post');
+  CUR = { post: ps[0], comments: cm }; document.title = CUR.post.title + ' · Threadly';
+  main.innerHTML = postCard(CUR.post, true) + `<div class="card" id="cbox">${ME ? `<div class="hint">Comment as u/${esc(ME.username)}</div><textarea id="ctext" maxlength="5000" placeholder="What are your thoughts?"></textarea><div class="btns"><button class="btn" data-act="comment">Comment</button></div>` : '<div class="center"><p class="muted">Log in to join the conversation.</p><button class="btn" data-act="login">Log in</button></div>'}</div><div class="card" id="clist"></div>`;
+  paintComments();
+}
+function paintComments() { const n = CUR.comments.length; $('#clist').innerHTML = `<h3>${n} comment${n === 1 ? '' : 's'}</h3>` + (n ? commentTree(CUR.comments) : '<div class="muted center">No comments yet. Be the first!</div>'); }
+async function viewUser(name, tab, rid) {
+  main.innerHTML = '<div class="card muted">Loading…</div>';
+  const info = await DB.userInfo(name); if (rid !== routeId) return; if (!info) return notFound('user');
+  document.title = 'u/' + name + ' · Threadly';
+  const head = `<div class="card prof">${av(name, 64)}<div><h2 style="margin:0">u/${esc(name)}</h2><div class="muted">${fmtN(info.karma)} karma · ${info.posts} posts · ${info.comments} comments · joined ${new Date(info.created).toLocaleDateString()}</div></div></div><div class="sorts"><a class="chip ${tab ? '' : 'on'}" href="#/u/${name}">Posts</a><a class="chip ${tab ? 'on' : ''}" href="#/u/${name}/comments">Comments</a></div>`;
+  if (tab === 'comments') {
+    const cs = await DB.userComments(name); if (rid !== routeId) return;
+    main.innerHTML = head + (cs.length ? cs.map(c => `<div class="card"><div class="meta">on <a class="c" href="#/post/${c.post_id}">${esc(c.postTitle || 'a post')}</a><span>·</span><a href="#/c/${esc(c.community)}">c/${esc(c.community)}</a><span>·</span><span>${ago(c.created)}</span><span>·</span><span>${c.score} points</span></div><div class="body">${md(c.body)}</div></div>`).join('') : '<div class="card muted center">No comments yet.</div>');
+    return;
+  }
+  const posts = await DB.posts({ author: name }); if (rid !== routeId) return;
+  main.innerHTML = head + '<div id="list"></div>'; FEED = { posts, shown: 25, empty: 'No posts yet.' }; SORT = 'new'; paintFeed();
+}
+async function viewSearch(term, rid) {
+  term = term.trim(); document.title = 'Search · Threadly';
+  main.innerHTML = '<div class="card muted">Searching…</div>';
+  const posts = term ? await DB.posts({ q: term }) : []; if (rid !== routeId) return;
+  const t = term.toLowerCase(), cs = COMMS.filter(c => t && (c.name + ' ' + c.title + ' ' + c.desc).toLowerCase().includes(t));
+  main.innerHTML = homeHead('Search', term ? `Results for “${esc(term)}”` : 'Type something in the search box.') + (cs.length ? `<div class="card"><h3>Communities</h3>${cs.map(c => `<a class="side-c" href="#/c/${c.name}">${cdot(c.name, 32)}<span class="grow"><b>c/${esc(c.name)}</b> <span class="hint">${fmtN(c.members)} members</span><br><span class="hint">${esc(c.desc)}</span></span></a>`).join('')}</div>` : '') + `<div id="list"></div>`;
+  FEED = { posts, shown: 25, empty: term ? 'No posts match that.' : '' }; SORT = 'hot'; paintFeed();
+}
+function viewSubmit(pre) {
+  if (!ME) { main.innerHTML = '<div class="card center"><h2>Create a post</h2><p class="muted">Log in to post.</p><button class="btn" data-act="login">Log in</button></div>'; return; }
+  document.title = 'New post · Threadly';
+  const sel = pre || (location.hash.match(/c=(\w+)/) || [])[1] || '';
+  const opts = [...COMMS.filter(c => JOINED.has(c.name)), ...COMMS.filter(c => !JOINED.has(c.name))].map(c => `<option value="${esc(c.name)}" ${c.name === sel ? 'selected' : ''}>c/${esc(c.name)}</option>`).join('');
+  main.innerHTML = `<div class="card"><h2>Create a post</h2><form id="pf"><label>Community</label><select id="pc" required><option value="">Choose a community…</option>${opts}</select>
+    <div class="tabs"><button type="button" class="chip on" data-act="ptab" data-t="text">Text</button><button type="button" class="chip" data-act="ptab" data-t="link">Link</button><button type="button" class="chip" data-act="ptab" data-t="image">Image</button></div>
+    <input id="pt" maxlength="300" placeholder="Title" required><div class="row" id="ptext"><textarea id="pb" maxlength="10000" placeholder="Text (optional). You can use **bold**, *italic*, - lists and > quotes."></textarea></div>
+    <div class="row" id="plink" hidden><input id="pu" type="url" placeholder="https://…"></div><div class="row" id="pimg" hidden><input id="pi" type="file" accept="image/*"><div id="ppv"></div></div>
+    <div class="err" id="perr"></div><div class="btns"><a class="btn ghost" href="javascript:history.back()">Cancel</a><button class="btn" type="submit" id="pgo">Post</button></div></form></div>`;
+  let tab = 'text', img = '';
+  $$('[data-act=ptab]').forEach(b => b.onclick = () => { tab = b.dataset.t; $$('[data-act=ptab]').forEach(x => x.classList.toggle('on', x === b)); $('#ptext').hidden = tab !== 'text'; $('#plink').hidden = tab !== 'link'; $('#pimg').hidden = tab !== 'image'; });
+  $('#pi').onchange = async e => { const f = e.target.files[0]; if (!f) return; try { img = await shrink(f); $('#ppv').innerHTML = `<img class="pv" src="${img}" alt="preview">`; $('#perr').textContent = ''; } catch (er) { img = ''; $('#ppv').innerHTML = ''; $('#perr').textContent = er.message; } };
+  $('#pf').onsubmit = async e => {
+    e.preventDefault(); const err = m => $('#perr').textContent = m, c = $('#pc').value, t = $('#pt').value.trim(), b = $('#pb').value.trim(), u = $('#pu').value.trim();
+    if (!c) return err('Choose a community first.'); if (!t) return err('Give your post a title.');
+    if (tab === 'link' && !okUrl(u)) return err('Links must start with http:// or https://');
+    if (tab === 'image' && !img) return err('Pick a picture first.');
+    if (!clean(t, b)) return err(FRIENDLY);
+    $('#pgo').disabled = true;
+    try { const id = await DB.addPost({ community: c, title: t, body: tab === 'text' ? b : '', url: tab === 'link' ? u : '', image: tab === 'image' ? img : '' }); toast('Posted!'); location.hash = '#/post/' + id; }
+    catch (er) { err(er.message); $('#pgo').disabled = false; }
+  };
+}
+function viewNewCommunity() {
+  if (!ME) { main.innerHTML = '<div class="card center"><h2>Create a community</h2><p class="muted">Log in to create one.</p><button class="btn" data-act="login">Log in</button></div>'; return; }
+  document.title = 'New community · Threadly';
+  main.innerHTML = `<div class="card"><h2>Create a community</h2><p class="hint">You will be its moderator: you can delete posts and comments in it.</p><form id="cf"><label>Name (letters, numbers, _)</label><input id="cn" maxlength="21" placeholder="mycoolclub" required autocapitalize="off"><label>Title</label><input id="ct" maxlength="60" placeholder="My Cool Club"><label>Description</label><textarea id="cd" maxlength="300" placeholder="What is this community about?"></textarea><div class="err" id="cerr"></div><div class="btns"><button class="btn" type="submit" id="cgo">Create</button></div></form></div>`;
+  $('#cf').onsubmit = async e => {
+    e.preventDefault(); const n = $('#cn').value.trim(), t = $('#ct').value.trim(), d = $('#cd').value.trim();
+    if (!clean(n, t, d)) return $('#cerr').textContent = FRIENDLY;
+    $('#cgo').disabled = true;
+    try { await DB.createCommunity(n, t, d); await loadMeta(); toast('Community created!'); location.hash = '#/c/' + n; } catch (er) { $('#cerr').textContent = er.message; $('#cgo').disabled = false; }
+  };
+}
+function viewSettings() {
+  document.title = 'Settings · Threadly';
+  const on = DB.kind === 'remote';
+  main.innerHTML = `<div class="card"><h2>Settings</h2><div class="row"><label for="sTheme">Theme</label><select id="sTheme"><option value="auto">Match my device</option><option value="dark">Dark</option><option value="light">Light</option></select></div>
+    <div class="row"><label style="display:flex;gap:10px;align-items:flex-start;font-weight:400"><input type="checkbox" id="sFilter" style="width:auto;margin-top:4px"> <span><b>Family-friendly filter</b><br><span class="hint">Blocks rude words in posts, comments and community names.</span></span></label></div></div>
+    <div class="card"><h3>Online mode</h3><p>${on ? '🟢 <b>Connected</b> to your server. Everyone who uses this app sees the same posts.' : '🟠 <b>Demo mode.</b> Everything you do is saved only on this device. To share with friends, connect a free Supabase server.'}</p>
+    ${on ? `<div class="hint">Server: ${esc(ST.server.url)}</div><div class="btns"><button class="btn danger" id="sOff">Disconnect (back to demo mode)</button></div>` : `<label>Project URL</label><input id="sUrl" placeholder="https://abcdxyz.supabase.co" autocapitalize="off"><label>Anon (public) key</label><input id="sKey" placeholder="eyJ…" autocapitalize="off"><div class="err" id="sErr"></div><div class="btns"><button class="btn" id="sOn">Connect</button></div>
+    <details><summary>How to set up the server (about 10 minutes, ask a parent to help)</summary><ol class="steps"><li>Go to <b>supabase.com</b> and make a free account and a new project.</li><li>Open <b>SQL Editor</b>, paste everything from the file <b>supabase-schema.sql</b> (in this app's folder, or on GitHub), and press <b>Run</b>.</li><li>Open <b>Authentication → Providers → Email</b> and switch <b>Confirm email</b> OFF.</li><li>Open <b>Project Settings → API</b>. Copy the <b>Project URL</b> and the <b>anon public</b> key and paste them above.</li></ol></details>`}</div>
+    <div class="card"><h3>About</h3><p class="hint">Threadly: communities, posts, votes and comments. ${on ? '' : '<br>Demo data (the sample communities) is only for trying the app out.'}</p><div class="btns" style="justify-content:flex-start;flex-wrap:wrap"><a class="btn ghost sm" href="privacy.html">Privacy policy</a>${on ? '' : '<button class="btn ghost sm" id="sReset">Reset demo data</button>'}</div></div>`;
+  $('#sTheme').value = ST.theme; $('#sTheme').onchange = e => { ST.theme = e.target.value; saveST(); applyTheme(); };
+  $('#sFilter').checked = ST.filter; $('#sFilter').onchange = e => { ST.filter = e.target.checked; saveST(); };
+  if (on) $('#sOff').onclick = async () => { if (await ask('Disconnect from the server? You will be logged out.', 'Disconnect')) { await Remote.signOut(); ST.server = null; CFG.url = ''; saveST(); location.hash = '#/'; location.reload(); } };
+  else {
+    $('#sOn').onclick = async () => {
+      const url = $('#sUrl').value.trim().replace(/\/+$/, ''), key = $('#sKey').value.trim(), err = m => $('#sErr').textContent = m;
+      if (!/^https:\/\/[\w-]+\.supabase\.(co|in)$/i.test(url)) return err('The URL should look like https://abcdxyz.supabase.co');
+      if (key.length < 20) return err('Paste the long anon public key.');
+      $('#sOn').disabled = true; err('Testing…');
+      try {
+        const st = await Remote.ping(url, key);
+        if (st === 200) { ST.server = { url, key }; saveST(); toast('Connected!'); setTimeout(() => { location.hash = '#/'; location.reload(); }, 400); return; }
+        err(st === 404 ? 'Connected, but the tables are missing. Run supabase-schema.sql in the SQL Editor first.' : st === 401 || st === 403 ? 'The server refused that key. Copy the anon public key again.' : 'The server answered with error ' + st);
+      } catch (e) { err('Could not reach that server. Check the URL and your internet.'); }
+      $('#sOn').disabled = false;
+    };
+    $('#sReset').onclick = async () => { if (await ask('Delete all demo data on this device and start fresh?', 'Reset')) { Local.reset(); location.hash = '#/'; location.reload(); } };
+  }
+}
+
+/* ---------- login / report modals ---------- */
+function loginModal(mode = 'in') {
+  const up = mode === 'up';
+  modal(`<h3>${up ? 'Create your account' : 'Welcome back'}</h3><p class="hint">${DB.kind === 'local' ? 'Demo mode: this account lives only on this device.' : 'Your account on the shared server.'}</p>
+    <form id="lf"><label>Username</label><input id="lu" maxlength="20" autocomplete="username" autocapitalize="off" required><label>Password</label><input id="lp" type="password" autocomplete="${up ? 'new-password' : 'current-password'}" required>
+    <div class="err" id="lerr"></div><div class="btns" style="justify-content:space-between;align-items:center"><button type="button" class="hint" id="lsw" style="text-decoration:underline">${up ? 'I have an account' : 'Create an account'}</button><button class="btn" type="submit" id="lgo">${up ? 'Sign up' : 'Log in'}</button></div></form>`);
+  $('#lsw').onclick = () => loginModal(up ? 'in' : 'up');
+  $('#lf').onsubmit = async e => {
+    e.preventDefault(); const u = $('#lu').value.trim(), p = $('#lp').value; $('#lgo').disabled = true;
+    try { if (up) { if (!clean(u)) throw new Error(FRIENDLY); await DB.signUp(u, p); } else await DB.signIn(u, p); closeModal(); await loadMeta(); toast(up ? 'Welcome to Threadly, ' + u + '!' : 'Welcome back!'); route(); }
+    catch (er) { $('#lerr').textContent = er.message; $('#lgo').disabled = false; }
+  };
+}
+function reportModal(kind, id) {
+  modal(`<h3>Report</h3><p class="hint">Tell us what is wrong. The people running this community will look at it.</p><form id="rf"><select id="rr"><option>Spam</option><option>Mean or bullying</option><option>Not appropriate for kids</option><option>Other</option></select><div class="btns"><button type="button" class="btn ghost" id="rNo">Cancel</button><button class="btn" type="submit">Send report</button></div></form>`);
+  $('#rNo').onclick = closeModal;
+  $('#rf').onsubmit = async e => { e.preventDefault(); try { await DB.report(kind, id, $('#rr').value); closeModal(); toast('Thanks, we got your report'); } catch (er) { closeModal(); toast(er.message); } };
+}
+
+/* ---------- actions ---------- */
+function setVoteUI(box, nv, old) {
+  const sc = $('.sc', box), s = (+sc.dataset.s) - old + nv; sc.dataset.s = s; sc.textContent = fmtN(s); box.dataset.my = nv;
+}
+document.addEventListener('click', async e => {
+  const nav = $('#nav'); if (nav.classList.contains('open') && !e.target.closest('#burger') && (e.target.closest('#nav a') || !e.target.closest('#nav'))) nav.classList.remove('open');
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, id = +b.dataset.id;
+  try {
+    if (a === 'login') loginModal();
+    else if (a === 'logout') { await DB.signOut(); await loadMeta(); toast('Logged out'); route(); }
+    else if (a === 'vote') {
+      if (!need()) return; const box = b.closest('[data-vk]'), k = box.dataset.vk, vid = +box.dataset.id, cur = +box.dataset.my || 0, dir = +b.dataset.v, nv = cur === dir ? 0 : dir;
+      setVoteUI(box, nv, cur);
+      try { await DB.vote(k, vid, nv); const arr = k === 'p' ? [...FEED.posts, ...(CUR ? [CUR.post] : [])] : (CUR ? CUR.comments : []); arr.forEach(x => { if (x.id === vid) { x.score += nv - cur; x.myVote = nv; } }); } catch (er) { setVoteUI(box, cur, nv); toast(er.message); }
+    }
+    else if (a === 'sort') { SORT = b.dataset.s; ST.sort = SORT; saveST(); paintFeed(); }
+    else if (a === 'refresh') route();
+    else if (a === 'more') { FEED.shown += 25; paintFeed(); }
+    else if (a === 'join' || a === 'leave') { if (!need()) return; const n = b.dataset.c; await (a === 'join' ? DB.join(n) : DB.leave(n)); await loadMeta(); toast(a === 'join' ? 'Joined c/' + n : 'Left c/' + n); route(); }
+    else if (a === 'save') { if (!need()) return; const on = !b.classList.contains('on'); await DB.save(id, on); b.classList.toggle('on', on); b.textContent = on ? '🔖 Saved' : '🔖 Save'; [...FEED.posts, ...(CUR ? [CUR.post] : [])].forEach(x => { if (x.id === id) x.saved = on; }); toast(on ? 'Saved' : 'Removed from saved'); }
+    else if (a === 'share') { const url = location.href.split('#')[0] + '#/post/' + id; if (navigator.share) { try { await navigator.share({ title: 'Threadly', url }); } catch (er) {} } else { try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (er) { prompt('Copy this link:', url); } } }
+    else if (a === 'delpost') { if (await ask('Delete this post? This cannot be undone.', 'Delete')) { await DB.delPost(id); toast('Post deleted'); if (location.hash.startsWith('#/post/')) location.hash = '#/c/' + (CUR ? CUR.post.community : ''); else route(); } }
+    else if (a === 'delcm') { if (await ask('Delete this comment and its replies?', 'Delete')) { await DB.delComment(id); CUR.comments = await DB.comments(CUR.post.id); CUR.post.comments = CUR.comments.length; paintComments(); toast('Comment deleted'); } }
+    else if (a === 'report') { if (!need()) return; reportModal(b.dataset.k, id); }
+    else if (a === 'fold') { b.closest('.cm').classList.toggle('folded'); b.textContent = b.closest('.cm').classList.contains('folded') ? '[+]' : '[–]'; }
+    else if (a === 'reply') {
+      if (!need()) return; const box = $('.reply', b.closest('.cmain'));
+      if (box.innerHTML) { box.innerHTML = ''; return; }
+      box.innerHTML = `<textarea maxlength="5000" placeholder="Write a reply…"></textarea><div class="btns"><button class="btn ghost sm" data-act="rcancel">Cancel</button><button class="btn sm" data-act="rsend" data-id="${id}">Reply</button></div>`; $('textarea', box).focus();
+    }
+    else if (a === 'rcancel') b.closest('.reply').innerHTML = '';
+    else if (a === 'rsend' || a === 'comment') {
+      const ta = a === 'comment' ? $('#ctext') : $('textarea', b.closest('.reply')), body = ta.value.trim();
+      if (!body) return toast('Write something first'); if (!clean(body)) return toast(FRIENDLY);
+      b.disabled = true;
+      try { await DB.addComment(CUR.post.id, a === 'rsend' ? id : 0, body); CUR.comments = await DB.comments(CUR.post.id); CUR.post.comments = CUR.comments.length; paintComments(); if (a === 'comment') ta.value = ''; toast('Comment added'); } finally { b.disabled = false; }
+    }
+    else if (a === 'install' && installEv) { installEv.prompt(); installEv = null; paintNav(); }
+  } catch (er) { toast(er.message || 'Something went wrong'); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.tagName === 'TEXTAREA') { const btn = $('[data-act=comment]') && e.target.id === 'ctext' ? $('[data-act=comment]') : e.target.closest('.reply') && $('[data-act=rsend]', e.target.closest('.reply')); if (btn) btn.click(); }
+});
+$('#modal').addEventListener('mousedown', e => { if (e.target.classList.contains('ov')) closeModal(); });
+$('#burger').onclick = e => { e.stopPropagation(); $('#nav').classList.toggle('open'); };
+$('#sf').onsubmit = e => { e.preventDefault(); const q = $('#q').value.trim(); if (q) location.hash = '#/search/' + encodeURIComponent(q); };
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEv = e; paintNav(); });
+
+/* ---------- router ---------- */
+async function route() {
+  const rid = ++routeId, h = location.hash || '#/'; let m;
+  document.title = 'Threadly';
+  try {
+    if (h === '#/' || h === '#') await viewHome(rid);
+    else if (h === '#/popular') await viewPopular(rid);
+    else if (h === '#/saved') await viewSaved(rid);
+    else if ((m = h.match(/^#\/c\/(\w+)$/))) await viewCommunity(m[1], rid);
+    else if ((m = h.match(/^#\/post\/(\d+)$/))) await viewPost(+m[1], rid);
+    else if ((m = h.match(/^#\/u\/(\w+)(?:\/(comments))?$/))) await viewUser(m[1], m[2], rid);
+    else if ((m = h.match(/^#\/search\/(.*)$/))) await viewSearch(decodeURIComponent(m[1]), rid);
+    else if (h.startsWith('#/submit')) viewSubmit();
+    else if (h === '#/new-community') viewNewCommunity();
+    else if (h === '#/settings') viewSettings();
+    else notFound();
+  } catch (er) {
+    if (rid === routeId) main.innerHTML = `<div class="card"><h3>Something went wrong</h3><p class="muted">${esc(er.message || er)}</p><button class="btn" data-act="refresh">Try again</button></div>`;
+  }
+  paintNav();
+}
+window.addEventListener('hashchange', () => { window.scrollTo(0, 0); route(); });
+(async function start() {
+  try { await loadMeta(); } catch (e) { toast('Could not reach the server: ' + e.message); }
+  route();
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+</script></body></html>
