@@ -1,4 +1,4 @@
--- Threadly server setup for Supabase. Paste ALL of this into: Supabase > SQL Editor > New query > Run.
+-- Nestly server setup for Supabase. Paste ALL of this into: Supabase > SQL Editor > New query > Run.
 -- Then switch OFF "Confirm email" under Authentication > Providers > Email.
 
 create table if not exists profiles (

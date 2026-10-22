@@ -1,6 +1,6 @@
 {
-  "name": "Threadly - Communities, Posts and Comments",
-  "short_name": "Threadly",
+  "name": "Nestly - Communities, Posts and Comments",
+  "short_name": "Nestly",
   "description": "Join communities, share posts, vote and comment. Works on phone, tablet and laptop.",
   "id": "./", "start_url": "./", "scope": "./",
   "display": "standalone", "orientation": "any",

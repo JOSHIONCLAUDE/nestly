@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Threadly</title>
-<meta name="description" content="Threadly: communities, posts, votes and comments. Works on phone, tablet and laptop.">
+<title>Nestly</title>
+<meta name="description" content="Nestly: communities, posts, votes and comments. Works on phone, tablet and laptop.">
 <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#ff6a2b">
 <link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
@@ -117,14 +117,14 @@ img.pv{max-width:100%;max-height:260px;border-radius:10px;margin-top:8px}
 </style></head><body>
 <header id="top">
   <button id="burger" aria-label="Menu">☰</button>
-  <a href="#/" class="logo"><img src="icon-192.png" alt=""><span>Threadly</span></a>
-  <form id="sf"><input id="q" type="search" placeholder="Search Threadly" autocomplete="off" aria-label="Search"></form>
+  <a href="#/" class="logo"><img src="icon-192.png" alt=""><span>Nestly</span></a>
+  <form id="sf"><input id="q" type="search" placeholder="Search Nestly" autocomplete="off" aria-label="Search"></form>
   <a class="btn" href="#/submit" id="newpost">＋ Post</a>
   <div id="who"></div>
 </header>
 <div id="wrap"><nav id="nav"></nav><main id="main"></main><aside id="side"></aside></div>
 <div id="modal"></div><div id="toast"></div>
-<noscript><p style="padding:20px">Threadly needs JavaScript.</p></noscript>
+<noscript><p style="padding:20px">Nestly needs JavaScript.</p></noscript>
 <script src="config.js"></script>
 <script>
 'use strict';
@@ -139,7 +139,7 @@ const store = {
 };
 const ST = Object.assign({ theme: 'auto', filter: true, sort: 'hot', server: null }, store.get('tl_settings', {}));
 const saveST = () => store.set('tl_settings', ST);
-const CFG = window.THREADLY || {};
+const CFG = window.NESTLY || {};
 if (!ST.server && CFG.url && CFG.key) ST.server = { url: CFG.url, key: CFG.key };
 const dark = matchMedia('(prefers-color-scheme: dark)');
 const applyTheme = () => { document.documentElement.dataset.theme = ST.theme === 'auto' ? (dark.matches ? 'dark' : 'light') : ST.theme; };
@@ -207,7 +207,7 @@ const Local = (() => {
     ['art', 'Art and Drawing', 'Share your drawings and get friendly feedback.', 'sketchy_sam', 2150],
     ['pets', 'Pets', 'Dogs, cats, hamsters and everything in between.', 'whisker_wiz', 3890],
     ['school', 'School Help', 'Homework help and study tips.', 'study_buddy', 2760],
-    ['askthreadly', 'Ask Threadly', 'Ask anything. Get answers from the community.', 'new_here', 1980],
+    ['asknestly', 'Ask Nestly', 'Ask anything. Get answers from the community.', 'new_here', 1980],
     ['music', 'Music', 'Songs, instruments and learning to play.', 'beat_boxer', 1430],
     ['tech', 'Tech and Coding', 'Apps, websites and learning to code.', 'code_fox', 3320]
   ];
@@ -219,7 +219,7 @@ const Local = (() => {
     ['art', 'sketchy_sam', 'Drew my dog as a superhero', 'First time trying digital shading. Be honest, what should I improve?', 14, 77],
     ['pets', 'whisker_wiz', 'My cat learned to open doors', 'Now nothing is safe. Does anyone know how to stop this? 😂', 30, 505],
     ['school', 'study_buddy', 'How I remember maths formulas (3 tricks)', '- Write them on sticky notes\n- Explain the formula to someone else\n- Make up a silly song\n\nWorks for me!', 40, 260],
-    ['askthreadly', 'new_here', 'What should I name my first app?', 'It is a notes app for school. Ideas welcome!', 2, 14],
+    ['asknestly', 'new_here', 'What should I name my first app?', 'It is a notes app for school. Ideas welcome!', 2, 14],
     ['music', 'beat_boxer', 'Learning guitar: what songs are easy for beginners?', 'Just got a guitar for my birthday!', 11, 63],
     ['tech', 'code_fox', 'Tip: learn HTML, then CSS, then JavaScript', 'Build tiny projects as you go: a button counter, a to-do list, a quiz. Projects teach more than videos.', 50, 412],
     ['gaming', 'retro_rhea', 'Underrated games from 10 years ago', "Let's make a list! I'll start with Journey.", 70, 95],
@@ -316,7 +316,7 @@ const Remote = (() => {
   let S = store.get('tl_sess', null); // { access, refresh, exp, uid, username }
   const enc = encodeURIComponent, Q = s => String(s).replace(/[,()*%\\"]/g, ' ');
   const kindName = k => k === 'p' ? 'post' : 'comment';
-  const mail = u => u.toLowerCase() + '@threadly-app.com';
+  const mail = u => u.toLowerCase() + '@nestly-app.com';
   async function raw(path, { method = 'GET', body, prefer, token } = {}) {
     const r = await fetch(U() + path, { method, headers: Object.assign({ apikey: K(), Authorization: 'Bearer ' + (token || K()), 'Content-Type': 'application/json' }, prefer ? { Prefer: prefer } : {}), body: body === undefined ? undefined : JSON.stringify(body) });
     const txt = await r.text(); let j = null; try { j = txt ? JSON.parse(txt) : null; } catch (e) {}
@@ -498,7 +498,7 @@ const homeHead = (t, s) => `<div class="card"><h2>${t}</h2><div class="muted">${
 async function viewHome(rid) {
   const mine = [...JOINED];
   if (ME && mine.length) return feedPage(homeHead('🏠 Home', 'Posts from your communities'), { communities: mine }, 'No posts in your communities yet. Be the first to post!', rid);
-  return feedPage(homeHead('🏠 Home', ME ? 'Join some communities (left menu) to fill your home feed. Here are the popular posts.' : 'Welcome to Threadly! Log in to post, vote and comment.'), {}, 'No posts yet.', rid);
+  return feedPage(homeHead('🏠 Home', ME ? 'Join some communities (left menu) to fill your home feed. Here are the popular posts.' : 'Welcome to Nestly! Log in to post, vote and comment.'), {}, 'No posts yet.', rid);
 }
 const viewPopular = rid => feedPage(homeHead('🔥 Popular', 'The most upvoted posts from every community'), {}, 'No posts yet.', rid);
 async function viewSaved(rid) {
@@ -508,7 +508,7 @@ async function viewSaved(rid) {
 }
 async function viewCommunity(name, rid) {
   const c = comm(name); if (!c) return notFound('community');
-  document.title = 'c/' + name + ' · Threadly';
+  document.title = 'c/' + name + ' · Nestly';
   const joined = JOINED.has(name);
   const head = `<div class="card"><div class="banner" style="background:linear-gradient(120deg,hsl(${hue(name)},60%,38%),hsl(${(hue(name) + 60) % 360},60%,30%))"></div><div class="chead">${cdot(name)}<div class="grow"><h2 style="margin:0">${esc(c.title)}</h2><div class="muted">c/${esc(name)} · ${fmtN(c.members)} member${c.members === 1 ? '' : 's'}${c.creator ? ' · made by u/' + esc(c.creator) : ''}</div></div>
     <a class="btn ghost" href="#/submit?c=${name}">＋ Post</a><button class="btn ${joined ? 'ghost' : ''}" data-act="${joined ? 'leave' : 'join'}" data-c="${name}">${joined ? 'Joined ✓' : 'Join'}</button></div>${c.desc ? `<p style="margin:12px 0 0">${esc(c.desc)}</p>` : ''}${isMod(name) ? '<p class="hint" style="margin:8px 0 0">🛡 You made this community, so you can delete posts and comments in it.</p>' : ''}</div>`;
@@ -518,7 +518,7 @@ async function viewPost(id, rid) {
   main.innerHTML = '<div class="card muted">Loading…</div>';
   const [ps, cm] = await Promise.all([DB.posts({ ids: [id] }), DB.comments(id)]); if (rid !== routeId) return;
   if (!ps.length) return notFound('post');
-  CUR = { post: ps[0], comments: cm }; document.title = CUR.post.title + ' · Threadly';
+  CUR = { post: ps[0], comments: cm }; document.title = CUR.post.title + ' · Nestly';
   main.innerHTML = postCard(CUR.post, true) + `<div class="card" id="cbox">${ME ? `<div class="hint">Comment as u/${esc(ME.username)}</div><textarea id="ctext" maxlength="5000" placeholder="What are your thoughts?"></textarea><div class="btns"><button class="btn" data-act="comment">Comment</button></div>` : '<div class="center"><p class="muted">Log in to join the conversation.</p><button class="btn" data-act="login">Log in</button></div>'}</div><div class="card" id="clist"></div>`;
   paintComments();
 }
@@ -526,7 +526,7 @@ function paintComments() { const n = CUR.comments.length; $('#clist').innerHTML 
 async function viewUser(name, tab, rid) {
   main.innerHTML = '<div class="card muted">Loading…</div>';
   const info = await DB.userInfo(name); if (rid !== routeId) return; if (!info) return notFound('user');
-  document.title = 'u/' + name + ' · Threadly';
+  document.title = 'u/' + name + ' · Nestly';
   const head = `<div class="card prof">${av(name, 64)}<div><h2 style="margin:0">u/${esc(name)}</h2><div class="muted">${fmtN(info.karma)} karma · ${info.posts} posts · ${info.comments} comments · joined ${new Date(info.created).toLocaleDateString()}</div></div></div><div class="sorts"><a class="chip ${tab ? '' : 'on'}" href="#/u/${name}">Posts</a><a class="chip ${tab ? 'on' : ''}" href="#/u/${name}/comments">Comments</a></div>`;
   if (tab === 'comments') {
     const cs = await DB.userComments(name); if (rid !== routeId) return;
@@ -537,7 +537,7 @@ async function viewUser(name, tab, rid) {
   main.innerHTML = head + '<div id="list"></div>'; FEED = { posts, shown: 25, empty: 'No posts yet.' }; SORT = 'new'; paintFeed();
 }
 async function viewSearch(term, rid) {
-  term = term.trim(); document.title = 'Search · Threadly';
+  term = term.trim(); document.title = 'Search · Nestly';
   main.innerHTML = '<div class="card muted">Searching…</div>';
   const posts = term ? await DB.posts({ q: term }) : []; if (rid !== routeId) return;
   const t = term.toLowerCase(), cs = COMMS.filter(c => t && (c.name + ' ' + c.title + ' ' + c.desc).toLowerCase().includes(t));
@@ -546,7 +546,7 @@ async function viewSearch(term, rid) {
 }
 function viewSubmit(pre) {
   if (!ME) { main.innerHTML = '<div class="card center"><h2>Create a post</h2><p class="muted">Log in to post.</p><button class="btn" data-act="login">Log in</button></div>'; return; }
-  document.title = 'New post · Threadly';
+  document.title = 'New post · Nestly';
   const sel = pre || (location.hash.match(/c=(\w+)/) || [])[1] || '';
   const opts = [...COMMS.filter(c => JOINED.has(c.name)), ...COMMS.filter(c => !JOINED.has(c.name))].map(c => `<option value="${esc(c.name)}" ${c.name === sel ? 'selected' : ''}>c/${esc(c.name)}</option>`).join('');
   main.innerHTML = `<div class="card"><h2>Create a post</h2><form id="pf"><label>Community</label><select id="pc" required><option value="">Choose a community…</option>${opts}</select>
@@ -570,7 +570,7 @@ function viewSubmit(pre) {
 }
 function viewNewCommunity() {
   if (!ME) { main.innerHTML = '<div class="card center"><h2>Create a community</h2><p class="muted">Log in to create one.</p><button class="btn" data-act="login">Log in</button></div>'; return; }
-  document.title = 'New community · Threadly';
+  document.title = 'New community · Nestly';
   main.innerHTML = `<div class="card"><h2>Create a community</h2><p class="hint">You will be its moderator: you can delete posts and comments in it.</p><form id="cf"><label>Name (letters, numbers, _)</label><input id="cn" maxlength="21" placeholder="mycoolclub" required autocapitalize="off"><label>Title</label><input id="ct" maxlength="60" placeholder="My Cool Club"><label>Description</label><textarea id="cd" maxlength="300" placeholder="What is this community about?"></textarea><div class="err" id="cerr"></div><div class="btns"><button class="btn" type="submit" id="cgo">Create</button></div></form></div>`;
   $('#cf').onsubmit = async e => {
     e.preventDefault(); const n = $('#cn').value.trim(), t = $('#ct').value.trim(), d = $('#cd').value.trim();
@@ -580,14 +580,14 @@ function viewNewCommunity() {
   };
 }
 function viewSettings() {
-  document.title = 'Settings · Threadly';
+  document.title = 'Settings · Nestly';
   const on = DB.kind === 'remote';
   main.innerHTML = `<div class="card"><h2>Settings</h2><div class="row"><label for="sTheme">Theme</label><select id="sTheme"><option value="auto">Match my device</option><option value="dark">Dark</option><option value="light">Light</option></select></div>
     <div class="row"><label style="display:flex;gap:10px;align-items:flex-start;font-weight:400"><input type="checkbox" id="sFilter" style="width:auto;margin-top:4px"> <span><b>Family-friendly filter</b><br><span class="hint">Blocks rude words in posts, comments and community names.</span></span></label></div></div>
     <div class="card"><h3>Online mode</h3><p>${on ? '🟢 <b>Connected</b> to your server. Everyone who uses this app sees the same posts.' : '🟠 <b>Demo mode.</b> Everything you do is saved only on this device. To share with friends, connect a free Supabase server.'}</p>
     ${on ? `<div class="hint">Server: ${esc(ST.server.url)}</div><div class="btns"><button class="btn danger" id="sOff">Disconnect (back to demo mode)</button></div>` : `<label>Project URL</label><input id="sUrl" placeholder="https://abcdxyz.supabase.co" autocapitalize="off"><label>Anon (public) key</label><input id="sKey" placeholder="eyJ…" autocapitalize="off"><div class="err" id="sErr"></div><div class="btns"><button class="btn" id="sOn">Connect</button></div>
     <details><summary>How to set up the server (about 10 minutes, ask a parent to help)</summary><ol class="steps"><li>Go to <b>supabase.com</b> and make a free account and a new project.</li><li>Open <b>SQL Editor</b>, paste everything from the file <b>supabase-schema.sql</b> (in this app's folder, or on GitHub), and press <b>Run</b>.</li><li>Open <b>Authentication → Providers → Email</b> and switch <b>Confirm email</b> OFF.</li><li>Open <b>Project Settings → API</b>. Copy the <b>Project URL</b> and the <b>anon public</b> key and paste them above.</li></ol></details>`}</div>
-    <div class="card"><h3>About</h3><p class="hint">Threadly: communities, posts, votes and comments. ${on ? '' : '<br>Demo data (the sample communities) is only for trying the app out.'}</p><div class="btns" style="justify-content:flex-start;flex-wrap:wrap"><a class="btn ghost sm" href="privacy.html">Privacy policy</a>${on ? '' : '<button class="btn ghost sm" id="sReset">Reset demo data</button>'}</div></div>`;
+    <div class="card"><h3>About</h3><p class="hint">Nestly: communities, posts, votes and comments. ${on ? '' : '<br>Demo data (the sample communities) is only for trying the app out.'}</p><div class="btns" style="justify-content:flex-start;flex-wrap:wrap"><a class="btn ghost sm" href="privacy.html">Privacy policy</a>${on ? '' : '<button class="btn ghost sm" id="sReset">Reset demo data</button>'}</div></div>`;
   $('#sTheme').value = ST.theme; $('#sTheme').onchange = e => { ST.theme = e.target.value; saveST(); applyTheme(); };
   $('#sFilter').checked = ST.filter; $('#sFilter').onchange = e => { ST.filter = e.target.checked; saveST(); };
   if (on) $('#sOff').onclick = async () => { if (await ask('Disconnect from the server? You will be logged out.', 'Disconnect')) { await Remote.signOut(); ST.server = null; CFG.url = ''; saveST(); location.hash = '#/'; location.reload(); } };
@@ -617,7 +617,7 @@ function loginModal(mode = 'in') {
   $('#lsw').onclick = () => loginModal(up ? 'in' : 'up');
   $('#lf').onsubmit = async e => {
     e.preventDefault(); const u = $('#lu').value.trim(), p = $('#lp').value; $('#lgo').disabled = true;
-    try { if (up) { if (!clean(u)) throw new Error(FRIENDLY); await DB.signUp(u, p); } else await DB.signIn(u, p); closeModal(); await loadMeta(); toast(up ? 'Welcome to Threadly, ' + u + '!' : 'Welcome back!'); route(); }
+    try { if (up) { if (!clean(u)) throw new Error(FRIENDLY); await DB.signUp(u, p); } else await DB.signIn(u, p); closeModal(); await loadMeta(); toast(up ? 'Welcome to Nestly, ' + u + '!' : 'Welcome back!'); route(); }
     catch (er) { $('#lerr').textContent = er.message; $('#lgo').disabled = false; }
   };
 }
@@ -648,7 +648,7 @@ document.addEventListener('click', async e => {
     else if (a === 'more') { FEED.shown += 25; paintFeed(); }
     else if (a === 'join' || a === 'leave') { if (!need()) return; const n = b.dataset.c; await (a === 'join' ? DB.join(n) : DB.leave(n)); await loadMeta(); toast(a === 'join' ? 'Joined c/' + n : 'Left c/' + n); route(); }
     else if (a === 'save') { if (!need()) return; const on = !b.classList.contains('on'); await DB.save(id, on); b.classList.toggle('on', on); b.textContent = on ? '🔖 Saved' : '🔖 Save'; [...FEED.posts, ...(CUR ? [CUR.post] : [])].forEach(x => { if (x.id === id) x.saved = on; }); toast(on ? 'Saved' : 'Removed from saved'); }
-    else if (a === 'share') { const url = location.href.split('#')[0] + '#/post/' + id; if (navigator.share) { try { await navigator.share({ title: 'Threadly', url }); } catch (er) {} } else { try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (er) { prompt('Copy this link:', url); } } }
+    else if (a === 'share') { const url = location.href.split('#')[0] + '#/post/' + id; if (navigator.share) { try { await navigator.share({ title: 'Nestly', url }); } catch (er) {} } else { try { await navigator.clipboard.writeText(url); toast('Link copied'); } catch (er) { prompt('Copy this link:', url); } } }
     else if (a === 'delpost') { if (await ask('Delete this post? This cannot be undone.', 'Delete')) { await DB.delPost(id); toast('Post deleted'); if (location.hash.startsWith('#/post/')) location.hash = '#/c/' + (CUR ? CUR.post.community : ''); else route(); } }
     else if (a === 'delcm') { if (await ask('Delete this comment and its replies?', 'Delete')) { await DB.delComment(id); CUR.comments = await DB.comments(CUR.post.id); CUR.post.comments = CUR.comments.length; paintComments(); toast('Comment deleted'); } }
     else if (a === 'report') { if (!need()) return; reportModal(b.dataset.k, id); }
@@ -680,7 +680,7 @@ window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instal
 /* ---------- router ---------- */
 async function route() {
   const rid = ++routeId, h = location.hash || '#/'; let m;
-  document.title = 'Threadly';
+  document.title = 'Nestly';
   try {
     if (h === '#/' || h === '#') await viewHome(rid);
     else if (h === '#/popular') await viewPopular(rid);

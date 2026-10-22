@@ -1,4 +1,4 @@
-# Threadly
+# Nestly
 Communities, posts, votes and comments. Works on phone, tablet and laptop (installable as an app).
 
 - **Communities** you can join or create, **text / link / image posts**, **upvote and downvote**, **nested comments**, Hot / New / Top sorting, search, saved posts, user profiles with karma, report buttons, delete for authors and community creators, a family-friendly word filter, dark and light themes.
